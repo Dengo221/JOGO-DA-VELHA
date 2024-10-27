@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe Deluxe</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            background-color: #282c34;
+            color: #fff;
+            padding: 20px; /* Adicionando um padding */
+            overflow-y: auto; /* Permite a rolagem vertical */
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            text-align: center; /* Centraliza o texto */
+        }
+
+        .loading-text {
+            font-size: 10vw; /* Aumenta o tamanho em relação à largura da tela */
+            color: #FFD700; /* Amarelo */
+            margin-bottom: 10px;
+        }
+
+        .welcome-text {
+            font-size: 5vw; /* Tamanho ajustável para a mensagem de boas-vindas */
+            color: #FFFFFF; /* Branco */
+            margin-bottom: 20px;
+            line-height: 1.2; /* Espaçamento entre linhas */
+        }
+
+        .progress-container {
+            width: 80%;
+            height: 20px;
+            background-color: #444;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #FFD700; /* Amarelo */
+            transition: width 0.1s;
+        }
+
+        .percentage {
+            font-size: 6vw; /* Aumenta o tamanho em relação à largura da tela */
+            color: #FFD700; /* Amarelo */
+            margin-top: 10px;
+        }
+
+        .header {
+            display: none; /* Inicialmente escondido */
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .header-text {
+            font-size: 10vw; /* Tamanho ajustável para o cabeçalho */
+            color: #FFD700; /* Amarelo */
+        }
+
+        .mode-select, .difficulty-select, .player-names, .scores, .board, .victory-screen {
+            display: none; /* Inicialmente escondido */
+            margin-bottom: 20px; /* Adicionando espaço entre os componentes */
+        }
+
+        .how-to-play {
+            display: none; /* Inicialmente escondido */
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .how-to-play h2 {
+            color: #FFD700; /* Amarelo */
+            font-size: 5vw; /* Tamanho ajustável */
+            margin-bottom: 10px;
+        }
+
+        .how-to-play p {
+            color: #FFFFFF; /* Branco */
+            font-size: 4vw; /* Tamanho ajustável */
+            line-height: 1.5; /* Espaçamento entre linhas */
+        }
+
+        .contact {
+            margin-top: 20px;
+            font-size: 4vw; /* Tamanho ajustável */
+            color: #FFD700; /* Amarelo */
+            text-align: center;
+        }
+
+        .contact a {
+            color: #FFD700; /* Amarelo */
+            text-decoration: none; /* Remove sublinhado */
+        }
+
+        .contact a:hover {
+            text-decoration: underline; /* Sublinha ao passar o mouse */
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">GOMESZADA</div>
+        <div class="welcome-text">Bem-vindo! Jogue com seu amigo ou contra a IA</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="percentage" id="percentageText">0%</div>
+        <div class="contact">Fale com o dono: <a href="https://t.me/DENG0_VENDA">@DENG0_VENDA</a></div> <!-- Contato no Telegram -->
+    </div>
+
+    <div class="header" id="header">
+        <div class="header-text">GOMESZADA</div>
+    </div>
+
+    <div class="mode-select" id="modeSelect">
+        <button onclick="setGameMode('ai')">Play vs AI</button>
+        <button onclick="setGameMode('friend')">Play vs Friend</button>
+    </div>
+
+    <div class="difficulty-select" id="difficultySelect">
+        <button onclick="setDifficulty('easy')">Fácil</button>
+        <button onclick="setDifficulty('medium')">Médio</button>
+        <button onclick="setDifficulty('hard')">Difícil</button>
+    </div>
+
+    <div class="player-names" id="playerNames">
+        <input type="text" id="player1" placeholder="Player X Name">
+        <input type="text" id="player2" placeholder="Player O Name">
+        <button onclick="setPlayerNames()">Start Game</button>
+    </div>
+    
+    <div class="scores" id="scores">
+        <div class="score-box">
+            <span id="player1Name">Player X</span>: <span id="scoreX">0</span>
+        </div>
+        <div class="score-box">
+            <span id="player2Name">Player O</span>: <span id="scoreO">0</span>
+        </div>
+    </div>
+
+    <div class="board" id="board">
+        <div class="cell" onclick="makeMove(0)"></div>
+        <div class="cell" onclick="makeMove(1)"></div>
+        <div class="cell" onclick="makeMove(2)"></div>
+        <div class="cell" onclick="makeMove(3)"></div>
+        <div class="cell" onclick="makeMove(4)"></div>
+        <div class="cell" onclick="makeMove(5)"></div>
+        <div class="cell" onclick="makeMove(6)"></div>
+        <div class="cell" onclick="makeMove(7)"></div>
+        <div class="cell" onclick="makeMove(8)"></div>
+    </div>
+
+    <button onclick="resetBoard()" style="display: none;" id="resetButton">Reset Board</button>
+
+    <div class="victory-screen" id="victoryScreen">
+        <div class="victory-text" id="victoryText">VICTORY!</div>
+        <div class="draw-text" id="drawText" style="display: none;">VELHA!</div>
+        <button onclick="hideVictoryScreen()">Continue</button>
+    </div>
+
+    <div class="how-to-play" id="howToPlay">
+        <h2>Como Jogar</h2>
+        <p>O jogo da velha é um jogo para dois jogadores.</p>
+        <p>Um jogador joga com "X" e o outro com "O".</p>
+        <p>Os jogadores se alternam para colocar seu símbolo em uma grade 3x3.</p>
+        <p>O primeiro jogador a alinhar três símbolos em uma linha (horizontal, vertical ou diagonal) vence!</p>
+        <p>Se todas as casas forem preenchidas e ninguém vencer, o jogo termina em empate.</p>
+        <div class="contact">Fale com o dono: <a href="https://t.me/DENG0_VENDA">@DENG0_VENDA</a></div> <!-- Contato no Telegram -->
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function simulateLoading() {
+            const progressBar = document.getElementById('progressBar');
+            const percentageText = document.getElementById('percentageText');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('header').style.display = 'block'; // Exibe o cabeçalho
+                    document.querySelector('.mode-select').style.display = 'block'; // Exibe a seleção de modo
+                    document.getElementById('howToPlay').style.display = 'block'; // Exibe a seção "Como Jogar"
+                } else {
+                    width++;
+                    progressBar.style.width = width + '%';
+                    percentageText.textContent = width + '%';
+                }
+            }, 80); // Ajuste a velocidade do carregamento aqui
+        }
+
+        // Inicia a simulação ao carregar a página
+        window.onload = simulateLoading;
+    </script>
+</body>
+</html>
